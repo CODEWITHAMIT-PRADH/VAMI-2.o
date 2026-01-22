@@ -1,0 +1,38 @@
+<!-- ===================== style.css ===================== --><style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: white;
+}
+.header {
+  text-align: center;
+  padding: 20px;
+}
+.container {
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
+}
+.controls, .appointment, .transcription {
+  margin-bottom: 20px;
+  background: rgba(255,255,255,0.1);
+  padding: 15px;
+  border-radius: 10px;
+}
+button {
+  padding: 10px 15px;
+  background: #00d4ff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+#chatBox {
+  height: 200px;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.4);
+  padding: 10px;
+  border-radius: 10px;
+}
+</style>
+
