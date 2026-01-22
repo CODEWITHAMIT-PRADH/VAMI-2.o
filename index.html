@@ -1,0 +1,160 @@
+<!-- ===================== index.html ===================== --><!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VAMI Voice Assistant</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <h1>🎙️ VAMI Voice Assistant</h1>
+    <p>Your Smart AI Voice Companion</p>
+  </header>  <main class="container">
+    <section class="controls">
+      <label>Wake Word:</label>
+      <input type="text" id="wakeWord" value="hey vami" /><label>Voice Tone:</label>
+  <select id="voiceTone">
+    <option>Friendly</option>
+    <option>Professional</option>
+    <option>Calm</option>
+    <option>Energetic</option>
+  </select>
+
+  <button id="micBtn">🎤 Start Listening</button>
+</section>
+
+<section class="chat">
+  <div id="chatBox"></div>
+</section>
+
+<section class="appointment">
+  <h2>📅 Book Appointment</h2>
+  <input placeholder="Name" id="name" />
+  <input type="date" id="date" />
+  <input type="time" id="time" />
+  <button onclick="bookAppointment()">Book</button>
+  <p id="appointmentStatus"></p>
+</section>
+
+<section class="transcription">
+  <h2>📞 Call Transcription (Demo)</h2>
+  <textarea id="callText" placeholder="Paste call text here..."></textarea>
+  <button onclick="generateSummary()">Generate Summary</button>
+  <p id="summary"></p>
+</section>
+
+  </main>  <script src="voiceEngine.js"></script>  <script src="aiLogic.js"></script>  <script src="app.js"></script></body>
+</html><!-- ===================== style.css ===================== --><style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: white;
+}
+.header {
+  text-align: center;
+  padding: 20px;
+}
+.container {
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
+}
+.controls, .appointment, .transcription {
+  margin-bottom: 20px;
+  background: rgba(255,255,255,0.1);
+  padding: 15px;
+  border-radius: 10px;
+}
+button {
+  padding: 10px 15px;
+  background: #00d4ff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+#chatBox {
+  height: 200px;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.4);
+  padding: 10px;
+  border-radius: 10px;
+}
+</style><!-- ===================== voiceEngine.js ===================== --><script>
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+recognition.continuous = true;
+recognition.lang = 'en-US';
+
+recognition.onresult = (event) => {
+  const text = event.results[event.results.length - 1][0].transcript.toLowerCase();
+  handleVoiceInput(text);
+};
+
+function startListening() {
+  recognition.start();
+}
+</script><!-- ===================== aiLogic.js ===================== --><script>
+let memory = [];
+
+function aiResponse(userText) {
+  if (userText.includes('time')) return `Current time is ${new Date().toLocaleTimeString()}`;
+  if (userText.includes('date')) return `Today's date is ${new Date().toDateString()}`;
+  if (userText.includes('hello')) return 'Hello! How can I help you?';
+  return 'Sorry, I am still learning 😊';
+}
+</script><!-- ===================== app.js ===================== --><script>
+const micBtn = document.getElementById('micBtn');
+const chatBox = document.getElementById('chatBox');
+
+micBtn.onclick = () => startListening();
+
+// ================= SAFE REMINDER & FOCUS MODE =================
+let lastInteraction = Date.now();
+let reminderInterval = setInterval(() => {
+  const now = Date.now();
+  if (now - lastInteraction > 120000) { // 2 minutes inactivity
+    const msg = "I'm here 😊 Do you want help with something?";
+    addChat('VAMI', msg);
+    speak(msg);
+    lastInteraction = Date.now();
+  }
+}, 30000);
+
+function handleVoiceInput(text)(text) {
+  const wakeWord = document.getElementById('wakeWord').value.toLowerCase();
+  if (!text.includes(wakeWord)) return;
+
+  const command = text.replace(wakeWord, '').trim();
+  addChat('You', command);
+  lastInteraction = Date.now();
+
+  const reply = aiResponse(command);
+  addChat('VAMI', reply);
+  speak(reply);
+}
+
+function addChat(sender, msg) {
+  chatBox.innerHTML += `<p><strong>${sender}:</strong> ${msg}</p>`;
+}
+
+function speak(text) {
+  const utter = new SpeechSynthesisUtterance(text);
+  speechSynthesis.speak(utter);
+}
+
+// ================= MANUAL STOP ASSISTANT =================
+function stopAssistant() {
+  recognition.stop();
+  addChat('VAMI', 'Assistant stopped. You can start again anytime.');
+}
+
+function bookAppointment() {
+  document.getElementById('appointmentStatus').innerText = '✅ Appointment Booked Successfully';
+}
+
+function generateSummary() {
+  const text = document.getElementById('callText').value;
+  document.getElementById('summary').innerText = 'Summary: This call discussed important points.';
+}
+</script>
